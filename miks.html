@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/style.css">
+  </head>
+  <body>
+
+  <h2>Mastodon Instance Keyword Search</h2>
+
+As you might have surmised this tool uses the Instances.Social API to search both Mastodon instance names <b>and</b> descriptions by keyword. 
+
+  <input type="text" id="searchTerm">
+<button id="searchBtn">Search</button>
+
+<div id="output"></div>
+
+    <script>
+
+const API_KEY = 'paste your key here'; 
+ 
+// Get output div
+const searchTerm = document.getElementById('searchTerm');
+const searchBtn = document.getElementById('searchBtn');
+const outputDiv = document.getElementById('output');
+
+searchBtn.addEventListener('click', async () => {
+
+  const query = searchTerm.value;
+  
+  const data = await searchInstances(query);
+
+  outputDiv.innerHTML += formatResults(data);
+
+});
+
+async function searchInstances(query) {
+
+  const url = `https://instances.social/api/1.0/instances/search?q=${query}&count=0`;
+  
+  const options = {
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`
+    }
+  };
+  
+  const response = await fetch(url, options);
+
+  const data = await response.json();
+  console.log(data)
+
+  return data;
+
+}
+
+
+function formatResults(data) {
+
+  let html = '';
+
+  data.instances.forEach(instance => {
+
+    html += `
+      <div>
+        <h2><a href="http://${instance.name}" target="_blank">${instance.name}</a></h2>
+        <p>Users: ${instance.users}</p>
+        <p>${instance.info.short_description}</p> 
+      </div>
+    `;
+
+  });
+</script>
+  </body>
+</html>
